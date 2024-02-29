@@ -60,12 +60,4 @@ public class TestCarCompanyBuilder extends CarRentalCompanyImpl {
 
 class TestCarRentalCompany extends CarRentalCompanyImpl {
 
-    public BookingRepo getBookingRepo(){
-        return this.bookingRepo;
-    }
-
-    public CarRepo getCarRepo(){
-        return this.carRepo;
-    }
-
 }
