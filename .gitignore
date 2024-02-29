@@ -6,5 +6,4 @@ target/
 # files
 
 *.code-workspace
-
-
+*.class
