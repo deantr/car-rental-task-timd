@@ -1,4 +1,4 @@
-# carrental-task-td
+# carrental-task-timd
 
 * Whole exercise is coded as POJOs, (e.g. no Spring Boot, Rest endpoints, React UI, containerised DB, etc.)
 * POM as-was except updates to target Java version (17) and SureFire (3.2.5) (to clean up some funnies in the tests)
