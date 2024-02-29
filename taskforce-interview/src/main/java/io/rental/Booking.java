@@ -8,6 +8,7 @@ import io.utils.DatePeriod;
 
 /**
  * <p>Specifies a triplet of (Car, Renter, Period of time). </p>
+ * <p>Includes the price agred with the customer for the rental</P
  * <p>Assumptions/Notes:</p>
  * <ul>
  * <li>Hashcode/Equality assumes object-equality is implemented on all 3 items (it is)</li>
@@ -20,14 +21,16 @@ import io.utils.DatePeriod;
 @Immutable
 public class Booking {
 
-    protected Car car;
-    protected Renter renter;
-    protected DatePeriod period;
-    
-    public Booking(Car car, Renter renter, DatePeriod period) {
+    protected final Car car;
+    protected final Renter renter;
+    protected final DatePeriod period;
+    private final double agreedPrice;
+   
+    public Booking(Car car, Renter renter, DatePeriod period, double agreedPrice) {
         this.car = car;
         this.renter = renter;
         this.period = period;
+        this.agreedPrice = agreedPrice;
     }
 
     public Car getCar() {
@@ -41,6 +44,10 @@ public class Booking {
     public DatePeriod getPeriod() {
         return period;
     }
+
+    public double getAgreedPrice() {
+        return agreedPrice;
+    }    
 
     @Override
     public int hashCode() {
@@ -82,7 +89,8 @@ public class Booking {
     @Override
     public String toString() {
         return "Booking [car=" + car + ", renter=" + renter + ", period=" + period + "]";
-    }    
+    }
+
 }
 
 /**
@@ -102,7 +110,7 @@ class MaintenanceBooking extends Booking {
     public static Renter MAINTENANCE_RENTER = new Renter("", "", "", LocalDate.MIN);
 
     public MaintenanceBooking(Car car, DatePeriod period) {
-        super(car, MAINTENANCE_RENTER, period);        
+        super(car, MAINTENANCE_RENTER, period, 0);        
     }
 
     @Override

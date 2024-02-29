@@ -42,13 +42,14 @@ public class TestCarCompanyBuilder extends CarRentalCompanyImpl {
     }
 
     /**
-     * Adds a bunch of bookings
+     * <p>Adds a bunch of bookings</p>
+     * 
      * @return TestCarCompanyBuilder for fluent calling style
      * @throws Exception 
      */
     public TestCarCompanyBuilder withBookings(Booking... bookings) throws Exception {        
         for(Booking b: bookings){
-            carRentalCompany.bookCar(b.getCar(), b.getRenter(), b.getPeriod());
+            carRentalCompany.bookCar(b.getCar(), b.getRenter(), b.getPeriod(), b.getAgreedPrice());
         }
         return this;
     }
@@ -59,5 +60,13 @@ public class TestCarCompanyBuilder extends CarRentalCompanyImpl {
 }
 
 class TestCarRentalCompany extends CarRentalCompanyImpl {
+    public Booking createBookingAtGuidePrice(Car car, Renter renter, DatePeriod period){
+        return new Booking(car, renter, period, car.getCostPerDay());
+    }
+}
 
+class BookingAtGuidePrice extends Booking {
+    BookingAtGuidePrice(Car car, Renter renter, DatePeriod period){
+        super(car, renter, period, car.getCostPerDay());
+    }
 }

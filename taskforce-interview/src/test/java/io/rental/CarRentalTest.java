@@ -41,8 +41,8 @@ public class CarRentalTest {
     @Test
     public void s2_findingAnyAvailableCar() throws Exception{
 
-        Booking passatOutAlways = new Booking(VW_PASSAT_C1_110, RENTER_GRETA, ALL_TIME);
-        Booking onePoloOutThisWeek = new Booking(VW_POLO_A1_65, RENTER_JOE, THIS_WEEK);
+        Booking passatOutAlways = new Booking(VW_PASSAT_C1_110, RENTER_GRETA, ALL_TIME, 100);
+        Booking onePoloOutThisWeek = new Booking(VW_POLO_A1_65, RENTER_JOE, THIS_WEEK, 100);
 
         CarRentalCompany api = TestCarCompanyBuilder.create()
             .withCars()
@@ -85,7 +85,7 @@ public class CarRentalTest {
 
         CarRentalCompany api = TestCarCompanyBuilder.create()
             .withCars()
-            .withBookings(new Booking(MINI_COOPER_C1_170, RENTER_JOE, THIS_WEEK))
+            .withBookings(new Booking(MINI_COOPER_C1_170, RENTER_JOE, THIS_WEEK, 100))
             .build();
         
         int numberOwnedCars = api.getMatchingCars(Criteria.ALL).size();
@@ -98,7 +98,7 @@ public class CarRentalTest {
     public void s2_oneBookingOutsidePeriod() throws Exception{
         CarRentalCompany api = TestCarCompanyBuilder.create()
             .withCars()
-            .withBookings(new Booking(MINI_COOPER_C1_170, RENTER_JOE, NEXT_WEEK))
+            .withBookings(new Booking(MINI_COOPER_C1_170, RENTER_JOE, NEXT_WEEK, 100))
             .build();
             
         int numberOwnedCars = api.getMatchingCars(Criteria.ALL).size();
@@ -115,7 +115,7 @@ public class CarRentalTest {
             .withCars()            
             .build();
 
-        Booking gretasBooking = api.bookCar(MINI_COOPER_C1_170, RENTER_GRETA, THIS_WEEK);
+        Booking gretasBooking = api.bookCar(MINI_COOPER_C1_170, RENTER_GRETA, THIS_WEEK, 100);
 
         List<Booking> bookings = api.getBookingsForPeriod(THIS_WEEK);
 
@@ -126,8 +126,8 @@ public class CarRentalTest {
     @Test
     public void s3_cancellingABooking() throws Exception{       
 
-        Booking gretasBooking = new Booking(MINI_COOPER_C1_170, RENTER_GRETA, THIS_WEEK);
-        Booking joesBooking = new Booking(VW_GOLF_B2_90, RENTER_JOE, THIS_WEEK);
+        Booking gretasBooking = new Booking(MINI_COOPER_C1_170, RENTER_GRETA, THIS_WEEK, 100);
+        Booking joesBooking = new Booking(VW_GOLF_B2_90, RENTER_JOE, THIS_WEEK, 100);
 
         CarRentalCompany api = TestCarCompanyBuilder.create()        
             .withCars()            
@@ -151,21 +151,21 @@ public class CarRentalTest {
             .withCars()            
             .build();
             
-        api.bookCar(MINI_COOPER_C1_170, RENTER_GRETA, THIS_WEEK_AND_NEXT);
+        api.bookCar(MINI_COOPER_C1_170, RENTER_GRETA, THIS_WEEK_AND_NEXT, 100);
 
         assertThrows(
             Exception.class, 
-            () -> api.bookCar(MINI_COOPER_C1_170, RENTER_JOE, THIS_WEEK)
+            () -> api.bookCar(MINI_COOPER_C1_170, RENTER_JOE, THIS_WEEK, 100)
          );
     }
 
     @Test
     public void s4_preparingCarsForThisWeek() throws Exception{
 
-        Booking samLastWeek = new Booking(VW_GOLF_B2_90, RENTER_SAM, LAST_WEEK);
-        Booking gretaThisWeek = new Booking(VW_GOLF_B2_90, RENTER_GRETA, THIS_WEEK);
-        Booking joeThisWeek = new Booking(MINI_COOPER_C1_170, RENTER_JOE, THIS_WEEK);        
-        Booking maisyNextWeek = new Booking(VW_PASSAT_C1_110, RENTER_MAISY, NEXT_WEEK);
+        Booking samLastWeek = new Booking(VW_GOLF_B2_90, RENTER_SAM, LAST_WEEK, 100);
+        Booking gretaThisWeek = new Booking(VW_GOLF_B2_90, RENTER_GRETA, THIS_WEEK, 100);
+        Booking joeThisWeek = new Booking(MINI_COOPER_C1_170, RENTER_JOE, THIS_WEEK, 100);        
+        Booking maisyNextWeek = new Booking(VW_PASSAT_C1_110, RENTER_MAISY, NEXT_WEEK, 100);
 
         CarRentalCompany api = TestCarCompanyBuilder.create()
             .withCars()            
@@ -208,7 +208,7 @@ public class CarRentalTest {
     @Test
     public void s5_moveCustomerBooking() throws Exception{
 
-        Booking joeThisWeek = new Booking(MINI_COOPER_C1_170, RENTER_JOE, THIS_WEEK);        
+        Booking joeThisWeek = new Booking(MINI_COOPER_C1_170, RENTER_JOE, THIS_WEEK, 100);        
 
         CarRentalCompany api = TestCarCompanyBuilder.create()
             .withCars()            
@@ -221,7 +221,7 @@ public class CarRentalTest {
 
         // We have 2
         assertThat(bookings.size()).isEqualTo(2);
-        Booking joesNewBooking = new Booking(VW_PASSAT_C1_110, RENTER_JOE, THIS_WEEK);
+        Booking joesNewBooking = new Booking(VW_PASSAT_C1_110, RENTER_JOE, THIS_WEEK, 100);
         assertThat(bookings.contains(joesNewBooking));
         assertThat(bookings.contains(new MaintenanceBooking(MINI_COOPER_C1_170, THIS_WEEK)));
      
@@ -236,8 +236,8 @@ public class CarRentalTest {
     @Test
     public void s5_moveMultipleCustomerBookings() throws Exception{
         
-        Booking joeThisWeek = new Booking(MINI_COOPER_C1_170, RENTER_JOE, THIS_WEEK);        
-        Booking maisyNextWeek = new Booking(MINI_COOPER_C1_170, RENTER_MAISY, NEXT_WEEK);        
+        Booking joeThisWeek = new Booking(MINI_COOPER_C1_170, RENTER_JOE, THIS_WEEK, 100);        
+        Booking maisyNextWeek = new Booking(MINI_COOPER_C1_170, RENTER_MAISY, NEXT_WEEK, 100);        
 
         CarRentalCompany api = TestCarCompanyBuilder.create()
             .withCars()            
@@ -249,9 +249,9 @@ public class CarRentalTest {
 
     @Test
     public void s5_failIfNoCarAvailableForCustomer() throws Exception{
-        Booking joeThisWeek = new Booking(MINI_COOPER_C1_170, RENTER_JOE, THIS_WEEK);   // SWAP
-        Booking maisyThisWeek = new Booking(VW_PASSAT_C1_110, RENTER_MAISY, NEXT_WEEK); // KEEP
-        Booking samNextWeek = new Booking(MINI_COOPER_C1_170, RENTER_SAM, NEXT_WEEK);   // CANCELLED
+        Booking joeThisWeek = new Booking(MINI_COOPER_C1_170, RENTER_JOE, THIS_WEEK, 100);   // SWAP
+        Booking maisyThisWeek = new Booking(VW_PASSAT_C1_110, RENTER_MAISY, NEXT_WEEK, 100); // KEEP
+        Booking samNextWeek = new Booking(MINI_COOPER_C1_170, RENTER_SAM, NEXT_WEEK, 100);   // CANCELLED
 
         CarRentalCompany api = TestCarCompanyBuilder.create()
             .withCars()            
@@ -266,7 +266,7 @@ public class CarRentalTest {
         assertThat(bookings.size()).isEqualTo(2);
         
         Booking maintenanceBooking = new MaintenanceBooking(MINI_COOPER_C1_170, THIS_WEEK_AND_NEXT);
-        Booking joesSwappedBooking = new Booking(VW_PASSAT_C1_110, RENTER_JOE, THIS_WEEK);
+        Booking joesSwappedBooking = new Booking(VW_PASSAT_C1_110, RENTER_JOE, THIS_WEEK, 100);
         
         assertThat(bookings.contains(joesSwappedBooking));
         assertThat(bookings.contains(maisyThisWeek));
@@ -294,4 +294,23 @@ public class CarRentalTest {
         assertThat(carsView.get(0).getRentalGroupPrice()).isEqualTo(avgA1);
         assertThat(carsView.get(1).getRentalGroupPrice()).isEqualTo(avgA1);  
     }
+
+    @Test
+    public void s6_shopCanManagePricePerBooking() throws Exception{
+
+        CarRentalCompany api = TestCarCompanyBuilder.create()
+            .withCars()            
+            .build();
+
+        api.bookCar(VW_POLO_A1_65, RENTER_GRETA, LAST_WEEK, 900);
+
+        List<Booking> myBookings = api.getBookingsForPeriod(LAST_WEEK);
+
+        Double guidePrice = VW_POLO_A1_65.getCostPerDay();
+        Double groupPrice = api.getGroupPricing().get("A1");
+
+        assertThat(myBookings.get(0).getAgreedPrice()).isNotEqualTo(guidePrice);
+        assertThat(myBookings.get(0).getAgreedPrice()).isNotEqualTo(groupPrice);        
+    }
+
 }

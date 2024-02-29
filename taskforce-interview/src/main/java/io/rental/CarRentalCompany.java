@@ -4,6 +4,7 @@ import static java.util.stream.Collectors.toList;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import io.utils.DatePeriod;
 import static io.rental.Criteria.ALL;
@@ -18,13 +19,14 @@ public interface CarRentalCompany {
     List<Car> getMatchingCars(Criteria criteria);
     List<Car> getAvailableCars(DatePeriod period);
     List<Car> getAvailableCars(Criteria criteria, DatePeriod period);
+    Map<String, Double> getGroupPricing();
 
     // Customer View
     List<CarView> getMatchingCarsCustomerView(Criteria criteria);    
     List<CarView> getAvailableCarsCustomerView(Criteria criteria, DatePeriod period);
 
     void addCar(Car car);
-    Booking bookCar(Car car, Renter renter, DatePeriod period) throws Exception;
+    Booking bookCar(Car car, Renter renter, DatePeriod period, double agreedPrice) throws Exception;
     boolean cancelBooking(Booking booking) throws Exception;
 
     List<MaintenanceResult> bookMaintenance(String reason, Car car, DatePeriod period) throws Exception;
@@ -50,6 +52,14 @@ class CarRentalCompanyImpl implements CarRentalCompany {
     protected BookingRepo bookingRepo = new InMemoryBookingRepo(); 
     protected CarRepo carRepo = new InMemoryCarRepo();
     
+    @Override
+    public Map<String, Double> getGroupPricing() {
+        synchronized(lock){
+            return carRepo.getBlendedPrices();
+        }
+
+    }
+
     @Override
     public void addCar(Car car) {
         synchronized(lock){
@@ -91,9 +101,9 @@ class CarRentalCompanyImpl implements CarRentalCompany {
     }
 
     @Override
-    public Booking bookCar(Car car, Renter renter, DatePeriod period) throws Exception{
+    public Booking bookCar(Car car, Renter renter, DatePeriod period, double agreedPrice) throws Exception{
         synchronized(lock){
-            Booking booking = new Booking(car, renter, period);
+            Booking booking = new Booking(car, renter, period, agreedPrice);
             bookingRepo.add(booking);
             return booking;
         }
@@ -127,7 +137,7 @@ class CarRentalCompanyImpl implements CarRentalCompany {
                     // book first alternative
                     Car alt = available.get(0);
                     this.cancelBooking(conflict);
-                    Booking altBooking = this.bookCar(alt, conflict.getRenter(), conflict.getPeriod());
+                    Booking altBooking = this.bookCar(alt, conflict.getRenter(), conflict.getPeriod(), conflict.getAgreedPrice());
                     results.add(new CustomerBookingMoved(reason, conflict, altBooking));
                 } else {
                     // no alternatives exist
