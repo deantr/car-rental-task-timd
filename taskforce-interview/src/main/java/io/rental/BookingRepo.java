@@ -57,7 +57,6 @@ public interface BookingRepo {
 class InMemoryBookingRepo implements BookingRepo {
 
     private final List<Booking> db = new LinkedList<>(); // Since we'll only be scanning-through...
-    private final Object lock = new Object();
 
     @Override
     public List<Booking> getAll() {
