@@ -14,9 +14,14 @@ import static io.rental.Criteria.ALL;
  */
 public interface CarRentalCompany {
 
+    // Shop View
     List<Car> getMatchingCars(Criteria criteria);
     List<Car> getAvailableCars(DatePeriod period);
     List<Car> getAvailableCars(Criteria criteria, DatePeriod period);
+
+    // Customer View
+    List<CarView> getMatchingCarsCustomerView(Criteria criteria);    
+    List<CarView> getAvailableCarsCustomerView(Criteria criteria, DatePeriod period);
 
     void addCar(Car car);
     Booking bookCar(Car car, Renter renter, DatePeriod period) throws Exception;
@@ -32,7 +37,7 @@ public interface CarRentalCompany {
  * <p>Assumptions / Shortcuts:</p>
  * <ul>
  * <li>Exposing the repos via the protected class interface (would prefer dependency injection).</li>
- * <li>Synchronising on an internal lock obj here, giving a simplistic transaction across repos.</li>
+ * <li>Synchronising on an internal (reentrant) lock obj here, giving a simplistic transaction across repos.</li>
  * </ul>
  * 
   * @see BookingRepo BookingRepo for assumptions on that service
@@ -106,7 +111,6 @@ class CarRentalCompanyImpl implements CarRentalCompany {
             List<Booking> conflicts = bookingRepo.getConflicts(car, period);
             List<MaintenanceResult> results = new ArrayList<>();
             
-
             // Resolve conflicts - I've gone with "do the best we can" and leaving
             // the door open to inform the user if a cancellation was unavoidable.
 
@@ -151,6 +155,34 @@ class CarRentalCompanyImpl implements CarRentalCompany {
             return bookingRepo.getForPeriod(period);
         }
     }
+
+
+    @Override
+    public List<CarView> getAvailableCarsCustomerView(Criteria criteria, DatePeriod period) {
+        synchronized(lock){
+
+            List<Car> carsWithBookings = bookingRepo.getForPeriod(period).stream()
+                .map(b -> b.getCar())            
+                .distinct()
+                .collect(toList());
+
+            List<CarView> matchingCars = carRepo.getCustomerViewByCriteria(
+                AndCriteria.of(
+                    criteria, 
+                    ExclusionListCriteria.of(carsWithBookings))
+                    );        
+                    
+            return matchingCars;
+        }
+    }
+
+    @Override
+    public List<CarView> getMatchingCarsCustomerView(Criteria criteria) {
+        synchronized(lock){
+            return carRepo.getCustomerViewByCriteria(criteria);
+        }
+    }
+
 
     public void rentCar(Renter renter, Car car) {}
 

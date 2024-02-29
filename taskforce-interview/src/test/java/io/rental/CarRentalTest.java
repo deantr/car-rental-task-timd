@@ -277,4 +277,21 @@ public class CarRentalTest {
         assertThat(results.contains(new CustomerBookingMoved("", joeThisWeek, joesSwappedBooking)));
         assertThat(results.contains(new CustomerBookingCancelled("", samNextWeek)));
     }
+
+    @Test
+    public void s6_showCustomerCarsWithBlendedPrices(){
+
+        CarRentalCompany api = TestCarCompanyBuilder.create()
+            .withCars()            
+            .build();
+
+        Criteria vwPolo = CriteriaBuilder.create().make("VW").model("Polo").build();
+
+        List<CarView> carsView = api.getAvailableCarsCustomerView(vwPolo, ALL_TIME);
+        
+        double avgA1 = (VW_POLO_A1_70.getCostPerDay() + VW_POLO_A1_65.getCostPerDay()) / 2;
+
+        assertThat(carsView.get(0).getRentalGroupPrice()).isEqualTo(avgA1);
+        assertThat(carsView.get(1).getRentalGroupPrice()).isEqualTo(avgA1);  
+    }
 }

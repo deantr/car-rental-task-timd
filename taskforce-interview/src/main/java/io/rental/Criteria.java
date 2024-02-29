@@ -42,6 +42,10 @@ class CriteriaBuilder {
         criteria = new AndCriteria(criteria, new MakeCriteria(make));
         return this;
     }
+    public CriteriaBuilder model(String model){
+        criteria = new AndCriteria(criteria, new ModelCriteria(model));
+        return this;
+    }
 
     public CriteriaBuilder rentalGroup(String rentalGroup){
         criteria = new AndCriteria(criteria, new RentalGroupCriteria(rentalGroup));
@@ -101,6 +105,31 @@ class MakeCriteria implements Criteria {
     @Override
     public boolean test(Car car) {
         return car.getMake().contains(make);
+    }  
+}
+
+/**
+ * A {@link Criteria} that is true when a {@link Car}'s make contains the specified string.
+ */
+class ModelCriteria implements Criteria {
+
+    static ModelCriteria of(String model){
+        return new ModelCriteria(model);
+    }
+
+    private String model;
+
+    public ModelCriteria(String model) {
+        this.model = model;
+    }
+
+    public String getModel() {
+        return model;
+    }
+
+    @Override
+    public boolean test(Car car) {
+        return car.getModel().contains(model);
     }  
 }
 
