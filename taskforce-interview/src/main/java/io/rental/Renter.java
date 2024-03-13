@@ -67,5 +67,10 @@ public class Renter {
         return true;
     }
 
+    @Override
+    public String toString() {
+        return "Renter [" +firstName + " " + lastName + "]";
+    }
+
     
 }

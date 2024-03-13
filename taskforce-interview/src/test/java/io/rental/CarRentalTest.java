@@ -9,7 +9,9 @@ import static io.rental.TestCarCompanyBuilder.*;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class CarRentalTest {
 
@@ -34,8 +36,8 @@ public class CarRentalTest {
 
         // We have 2
         assertThat(matchingCars.size()).isEqualTo(2);
-        assertThat(matchingCars.contains(VW_POLO_A1_65));
-        assertThat(matchingCars.contains(VW_POLO_A1_70));
+        assertTrue(matchingCars.contains(VW_POLO_A1_65));
+        assertTrue(matchingCars.contains(VW_POLO_A1_70));
     }
 
     @Test
@@ -55,17 +57,17 @@ public class CarRentalTest {
 
         // We have 2
         assertThat(matchingCars.size()).isEqualTo(2);
-        assertThat(matchingCars.contains(VW_GOLF_B2_90));
-        assertThat(matchingCars.contains(VW_POLO_A1_70));
+        assertTrue(matchingCars.contains(VW_GOLF_B2_90));
+        assertTrue(matchingCars.contains(VW_POLO_A1_70));
 
         // Customer changes mind about car make
         matchingCars = api.getAvailableCars(ALL, THIS_WEEK);
 
         // We have 2
         assertThat(matchingCars.size()).isEqualTo(3);
-        assertThat(matchingCars.contains(VW_GOLF_B2_90));
-        assertThat(matchingCars.contains(VW_POLO_A1_70));
-        assertThat(matchingCars.contains(MINI_COOPER_C1_170));
+        assertTrue(matchingCars.contains(VW_GOLF_B2_90));
+        assertTrue(matchingCars.contains(VW_POLO_A1_70));
+        assertTrue(matchingCars.contains(MINI_COOPER_C1_170));
     }
 
     @Test
@@ -91,7 +93,7 @@ public class CarRentalTest {
         int numberOwnedCars = api.getMatchingCars(Criteria.ALL).size();
         List<Car> availableCars = api.getAvailableCars(Criteria.ALL, ALL_TIME);
         assertThat(availableCars.size()).isEqualTo(numberOwnedCars-1);
-        assertThat(!availableCars.contains(MINI_COOPER_C1_170));
+        assertFalse(availableCars.contains(MINI_COOPER_C1_170));
     }
 
     @Test
@@ -105,7 +107,7 @@ public class CarRentalTest {
         List<Car> availableCars = api.getAvailableCars(Criteria.ALL, THIS_WEEK);
 
         assertThat(availableCars.size()).isEqualTo(numberOwnedCars);
-        assertThat(!availableCars.contains(MINI_COOPER_C1_170));
+        assertTrue(availableCars.contains(MINI_COOPER_C1_170));
     }
     
     @Test
@@ -120,7 +122,7 @@ public class CarRentalTest {
         List<Booking> bookings = api.getBookingsForPeriod(THIS_WEEK);
 
         assertThat(bookings.size()).isEqualTo(1);
-        assertThat(bookings.contains(gretasBooking));
+        assertTrue(bookings.contains(gretasBooking));
     }
 
     @Test
@@ -136,12 +138,12 @@ public class CarRentalTest {
 
         List<Booking> bookings = api.getBookingsForPeriod(THIS_WEEK);
 
-        assertThat(api.cancelBooking(joesBooking)).isTrue();
+        assertTrue(api.cancelBooking(joesBooking));
 
         bookings = api.getBookingsForPeriod(THIS_WEEK);
         
         assertThat(bookings.size()).isEqualTo(1);
-        assertThat(bookings.contains(gretasBooking));
+        assertTrue(bookings.contains(gretasBooking));
     }
 
     @Test
@@ -182,8 +184,8 @@ public class CarRentalTest {
 
         // We have 2
         assertThat(upcomingBookings.size()).isEqualTo(2);
-        assertThat(upcomingBookings.contains(gretaThisWeek));
-        assertThat(upcomingBookings.contains(joeThisWeek));
+        assertTrue(upcomingBookings.contains(gretaThisWeek));
+        assertTrue(upcomingBookings.contains(joeThisWeek));
     }
 
     @Test
@@ -199,7 +201,7 @@ public class CarRentalTest {
 
         // We have 2
         assertThat(bookings.size()).isEqualTo(1);
-        assertThat(bookings.contains(new MaintenanceBooking(MINI_COOPER_C1_170, NEXT_WEEK)));
+        assertTrue(bookings.contains(new MaintenanceBooking(MINI_COOPER_C1_170, NEXT_WEEK)));
 
         // And no side-effects
         assertThat(results.size()).isEqualTo(0);
@@ -222,8 +224,8 @@ public class CarRentalTest {
         // We have 2
         assertThat(bookings.size()).isEqualTo(2);
         Booking joesNewBooking = new Booking(VW_PASSAT_C1_110, RENTER_JOE, THIS_WEEK, 100);
-        assertThat(bookings.contains(joesNewBooking));
-        assertThat(bookings.contains(new MaintenanceBooking(MINI_COOPER_C1_170, THIS_WEEK)));
+        assertTrue(bookings.contains(joesNewBooking));
+        assertTrue(bookings.contains(new MaintenanceBooking(MINI_COOPER_C1_170, THIS_WEEK)));
      
         // And 1 side-effects, customer has a new booking
         assertThat(results.size()).isEqualTo(1);
@@ -236,6 +238,7 @@ public class CarRentalTest {
     @Test
     public void s5_moveMultipleCustomerBookings() throws Exception{
         
+        // Both of these will be swapped to the alternative C1 - VW PASSAT
         Booking joeThisWeek = new Booking(MINI_COOPER_C1_170, RENTER_JOE, THIS_WEEK, 100);        
         Booking maisyNextWeek = new Booking(MINI_COOPER_C1_170, RENTER_MAISY, NEXT_WEEK, 100);        
 
@@ -244,14 +247,22 @@ public class CarRentalTest {
             .withBookings(joeThisWeek, maisyNextWeek)
             .build();
 
-        api.bookMaintenance("", MINI_COOPER_C1_170, THIS_WEEK_AND_NEXT);
+        List<MaintenanceResult> results = api.bookMaintenance("", MINI_COOPER_C1_170, THIS_WEEK_AND_NEXT);
+
+        Booking joeSwappedBooking = new Booking(VW_PASSAT_C1_110, RENTER_JOE, THIS_WEEK, 100);
+        Booking maisySwappedBooking = new Booking(VW_PASSAT_C1_110, RENTER_MAISY, NEXT_WEEK, 100);
+
+        // Both existing bookings will be swapped to the alternative C1 - VW PASSAT
+        assertThat(results.size()).isEqualTo(2);
+        assertTrue(results.contains(new CustomerBookingMoved("", joeThisWeek, joeSwappedBooking)));        
+        assertTrue(results.contains(new CustomerBookingMoved("", maisyNextWeek, maisySwappedBooking)));        
     }
 
     @Test
     public void s5_failIfNoCarAvailableForCustomer() throws Exception{
-        Booking joeThisWeek = new Booking(MINI_COOPER_C1_170, RENTER_JOE, THIS_WEEK, 100);   // SWAP
-        Booking maisyThisWeek = new Booking(VW_PASSAT_C1_110, RENTER_MAISY, NEXT_WEEK, 100); // KEEP
-        Booking samNextWeek = new Booking(MINI_COOPER_C1_170, RENTER_SAM, NEXT_WEEK, 100);   // CANCELLED
+        Booking joeThisWeek = new Booking(MINI_COOPER_C1_170, RENTER_JOE, THIS_WEEK, 100);   // CANCELLED (Maisy has VW PASSAT, the only alternative Car)
+        Booking maisyThisWeek = new Booking(VW_PASSAT_C1_110, RENTER_MAISY, THIS_WEEK, 100); // KEEP
+        Booking samNextWeek = new Booking(MINI_COOPER_C1_170, RENTER_SAM, NEXT_WEEK, 100);   // SWAP for VW (Maisy's booking is only for this week)
 
         CarRentalCompany api = TestCarCompanyBuilder.create()
             .withCars()            
@@ -260,22 +271,22 @@ public class CarRentalTest {
 
         List<MaintenanceResult> results = api.bookMaintenance("", MINI_COOPER_C1_170, THIS_WEEK_AND_NEXT);
         
-        List<Booking> bookings = api.getBookingsForPeriod(THIS_WEEK);
+        List<Booking> bookings = api.getBookingsForPeriod(THIS_WEEK_AND_NEXT);
 
-        // We have 2
-        assertThat(bookings.size()).isEqualTo(2);
+        // We have 3
+        assertThat(bookings.size()).isEqualTo(3);
         
         Booking maintenanceBooking = new MaintenanceBooking(MINI_COOPER_C1_170, THIS_WEEK_AND_NEXT);
-        Booking joesSwappedBooking = new Booking(VW_PASSAT_C1_110, RENTER_JOE, THIS_WEEK, 100);
+        Booking samsSwappedBooking = new Booking(VW_PASSAT_C1_110, RENTER_SAM, NEXT_WEEK, 100);
         
-        assertThat(bookings.contains(joesSwappedBooking));
-        assertThat(bookings.contains(maisyThisWeek));
-        assertThat(bookings.contains(maintenanceBooking));
+        assertThat(bookings.contains(samsSwappedBooking)).isTrue();
+        assertTrue(bookings.contains(maisyThisWeek));
+        assertTrue(bookings.contains(maintenanceBooking));
      
         // And 2 side-effects, JOE has a new booking, SAM has a cancellation
         assertThat(results.size()).isEqualTo(2);
-        assertThat(results.contains(new CustomerBookingMoved("", joeThisWeek, joesSwappedBooking)));
-        assertThat(results.contains(new CustomerBookingCancelled("", samNextWeek)));
+        assertTrue(results.contains(new CustomerBookingMoved("", samNextWeek, samsSwappedBooking)));        
+        assertTrue(results.contains(new CustomerBookingCancelled("", joeThisWeek)));
     }
 
     @Test
